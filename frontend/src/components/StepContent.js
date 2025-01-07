@@ -16,7 +16,6 @@ ChartJS.register(
     Legend
   );
 
-
 // TrainingControls Component: Used to get batchSize and epochSize inputs
 const TrainingControls = ({ onTrain }) => {
   const [batchSize, setBatchSize] = useState(32);
@@ -48,7 +47,7 @@ const TrainingControls = ({ onTrain }) => {
       </div>
       <button
         onClick={handleTrain}
-        className="px-4 py-2 bg-blue-500 text-white rounded-md"
+        className="px-4 py-2 bg-blue text-white rounded-md"
       >
         Train Model
       </button>
@@ -62,7 +61,7 @@ const TrainingModel = () => {
   const [accuracy, setAccuracy] = useState(null);
   const [progress, setProgress] = useState(0);
   const [modelMetrics, setModelMetrics] = useState(null);
-  const [imageUrl, setImageUrl] = useState(null);
+  // const [imageUrl, setImageUrl] = useState(null);
   const [trainAccuracy, setTrainAccuracy] = useState([]);
   const [valAccuracy, setValAccuracy] = useState([]);
   const [labels, setLabels] = useState([]);
@@ -155,14 +154,14 @@ const TrainingModel = () => {
           <p>Training Progress: {progress}%</p>
         </div>
       )}
-      {accuracy && <p className="text-green-500">Accuracy: {accuracy}%</p>}
+      {accuracy && <p className="text-green">Accuracy: {accuracy}%</p>}
       {modelMetrics && (
         <div className="mt-4">
           <p>Final Accuracy: {modelMetrics.accuracy}</p>
           <p>Final Loss: {modelMetrics.loss}</p>
         </div>
       )}
-      {imageUrl && <img src={imageUrl} alt="Model Accuracy Plot" className="mt-4" />}
+
       <div style={{ height: "400px", width: "100%" }}>
       <Line data={data} options={options} />
     </div>
@@ -172,6 +171,29 @@ const TrainingModel = () => {
 
 // StepContent Component: Contains all steps, including training and visualization
 const StepContent = ({ currentStep, nextStep, previousStep, steps }) => {
+  const [textInput, setTextInput] = useState("");
+  const [sentiment_percentage, setSentimentResult] = useState(null);
+
+  const analyzeSentiment = async () => {
+    try {
+      const response = await fetch("http://localhost:5000/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: textInput }),
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSentimentResult(data.sentiment_percentage);
+      } else {
+        setSentimentResult("Error analyzing sentiment.");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setSentimentResult("Failed to connect to the server.");
+    }
+  };
+
+
   const content = [
     {
       title: "Data Preprocessing",
@@ -200,10 +222,20 @@ train_sentences, train_labels = dataset_to_numpy_binary(train_data)`,
           <textarea
             className="w-full p-4 border rounded-md"
             placeholder="Enter text..."
+            value={textInput}
+            onChange={(e) => setTextInput(e.target.value)}
           />
-          <button className="mt-2 px-4 py-2 bg-green-500 text-white rounded-md">
+          <button
+            className="mt-2 px-4 py-2 bg-green text-white rounded-md"
+            onClick={analyzeSentiment}
+          >
             Analyze
           </button>
+          {sentiment_percentage && (
+            <div className="mt-4 p-2 border rounded-md">
+              Sentiment: {sentiment_percentage}
+            </div>
+          )}
         </div>
       ),
     },
@@ -221,24 +253,15 @@ train_sentences, train_labels = dataset_to_numpy_binary(train_data)`,
         <button
           onClick={previousStep}
           disabled={currentStep === 1}
-          className={`px-4 py-2 rounded-md ${
-            currentStep === 1
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-blue-500 text-white"
-          }`}
+          className={`px-4 py-2 bg-gray rounded-md ${currentStep === 1 ? "cursor-not-allowed" : ""}`}
         >
-          Previous Step
+          Previous
         </button>
         <button
           onClick={nextStep}
-          disabled={currentStep === steps.length}
-          className={`px-4 py-2 rounded-md ${
-            currentStep === steps.length
-              ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-              : "bg-green-500 text-white"
-          }`}
+          className="px-4 py-2 bg-blue text-white rounded-md"
         >
-          Next Step
+          {currentStep === steps.length ? "Finish" : "Next"}
         </button>
       </div>
     </div>

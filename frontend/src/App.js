@@ -25,9 +25,9 @@ const App = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div className="super-container">
       <Sidebar steps={steps} currentStep={currentStep} setCurrentStep={setCurrentStep} />
-      <div className="flex-1 p-8">
+      <div className="step-container">
         <StepContent 
           currentStep={currentStep} 
           nextStep={nextStep}

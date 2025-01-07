@@ -130,6 +130,28 @@ def train_and_visualize(batch_size, epochs):
     #     'image_url': url_for('static', filename="model_accuracy.png", _external=True)
     # })
 
+from tensorflow.keras.models import load_model
+
+model = load_model("sentiment_analysis_model.h5")
+
+@app.route("/analyze", methods=["POST"])
+def analyze_text():
+    data = request.get_json()
+    text = data.get("text", "")
+    
+    if not text:
+        return jsonify({"error": "No text provided"}), 400
+
+    # Tokenize and pad the input text
+    sequence = tokenizer.texts_to_sequences([text])
+    padded_sequence = pad_sequences(sequence, maxlen=max_length, padding="post", truncating="post")
+    
+    # Predict sentiment
+    prediction = model.predict(padded_sequence)[0][0]  # Probability of being positive sentiment
+    sentiment_percentage = float(prediction * 100)  # Convert to percentage
+
+    return jsonify({"sentiment_percentage": sentiment_percentage})
+
     # Route to start the training process
 @app.route('/start_training', methods=['POST'])
 def start_training():
