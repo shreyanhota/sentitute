@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import CodeBlock from "./CodeBlock";
 import PlotDisplay from "./PlotDisplay";
-import { useEffect } from 'react';
 import { io } from 'socket.io-client';
 import { Line } from "react-chartjs-2";
 import { Chart as ChartJS, CategoryScale, LinearScale, LineElement, PointElement, Title, Tooltip, Legend } from "chart.js";

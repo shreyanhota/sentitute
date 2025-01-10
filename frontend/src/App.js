@@ -12,6 +12,19 @@ const App = () => {
     "Analyze Text",
   ];
 
+  const [theme, setTheme] = useState("light");
+
+  const toggleThemeDark = () => {
+    setTheme("dark");
+    document.body.className = "dark";
+    };
+  
+
+  const toggleThemeLight = () => {
+    setTheme("light");
+    document.body.className = "light";
+  };
+
   const nextStep = () => {
     if (currentStep < steps.length) {
       setCurrentStep((prev) => prev + 1);
@@ -25,14 +38,29 @@ const App = () => {
   };
 
   return (
-    <div className="super-container">
-      <Sidebar steps={steps} currentStep={currentStep} setCurrentStep={setCurrentStep} />
-      <div className="step-container">
-        <StepContent 
-          currentStep={currentStep} 
-          nextStep={nextStep}
-          previousStep={previousStep}
-          steps={steps} />
+    <div className={`app-container ${theme}`}>
+      <header className="header">
+        <button className="theme-toggle-light" onClick={toggleThemeLight}>
+          {"Light Mode"}
+        </button>
+        <button className="theme-toggle-dark" onClick={toggleThemeDark}>
+          {"Dark Mode"}
+        </button>
+      </header>
+      <div className="super-container">
+        <Sidebar
+          steps={steps}
+          currentStep={currentStep}
+          setCurrentStep={setCurrentStep}
+        />
+        <div className="step-container">
+          <StepContent
+            currentStep={currentStep}
+            nextStep={nextStep}
+            previousStep={previousStep}
+            steps={steps}
+          />
+        </div>
       </div>
     </div>
   );
